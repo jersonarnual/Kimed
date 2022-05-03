@@ -16,8 +16,8 @@ namespace Kimed.Api
             {
                 try
                 {
-                    appContext.Database.Migrate();//when migrations are created
-                    //appContext.Database.EnsureCreated();
+                    appContext.Database.Migrate();
+                    appContext.Database.EnsureCreated();
                 }
                 catch (Exception ex)
                 {

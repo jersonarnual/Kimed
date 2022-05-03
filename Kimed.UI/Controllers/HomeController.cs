@@ -1,5 +1,6 @@
 ﻿using Kimed.UI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
@@ -11,17 +12,19 @@ namespace Kimed.UI.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IConfiguration _configuration;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger,
+                              IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
         }
 
         public IActionResult Index()
         {
             InfoViewModel model = new();
-            var url = $"http://localhost:8080/items";
-            var request = (HttpWebRequest)WebRequest.Create(url);
+            var request = (HttpWebRequest)WebRequest.Create(_configuration.GetValue<string>("UrlApiKimed"));
             request.Method = "GET";
             request.ContentType = "application/json";
             request.Accept = "application/json";
@@ -32,10 +35,10 @@ namespace Kimed.UI.Controllers
                 {
                     using (Stream strReader = response.GetResponseStream())
                     {
-                        if (strReader == null) 
+                        if (strReader == null)
                             return Error();
-                        
-                        using (StreamReader objReader = new StreamReader(strReader))
+
+                        using (StreamReader objReader = new(strReader))
                         {
                             string responseBody = objReader.ReadToEnd();
                             // Do something with responseBody
@@ -92,5 +95,8 @@ namespace Kimed.UI.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+
+
     }
 }

@@ -1,8 +1,10 @@
+using AutoMapper;
 using kimed.Business.Interface;
 using kimed.Business.Repository;
 using Kimed.Data.Context;
 using Kimed.Data.Interface;
 using Kimed.Data.Repository;
+using Kimed.Infraestructure.Util;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +27,13 @@ namespace Kimed.UI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddAutoMapper(typeof(Startup));
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new KimedProfile());
+            });
+
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
             services.AddRazorPages();
             services.AddDbContext<KimedContext>(item => item.UseSqlite(Configuration.GetConnectionString("KimedDB")), ServiceLifetime.Transient);
             LoadScopes(services);

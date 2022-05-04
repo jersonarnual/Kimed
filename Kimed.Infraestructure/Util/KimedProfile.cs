@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Kimed.Data.Models;
+using Kimed.Infraestructure.DTO;
 
 namespace Kimed.Infraestructure.Util
 {
@@ -6,7 +8,8 @@ namespace Kimed.Infraestructure.Util
     {
         public KimedProfile()
         {
-            CreateMap<object, object>();
+            CreateMap<InfoDTO, Info>();
+            CreateMap<Info, InfoDTO>();
         }
     }
 }

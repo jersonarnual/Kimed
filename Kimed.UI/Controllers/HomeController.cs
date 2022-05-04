@@ -1,11 +1,16 @@
-﻿using Kimed.UI.Models;
+﻿using AutoMapper;
+using Kimed.Infraestructure.DTO;
+using Kimed.Infraestructure.Util;
+using Kimed.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Kimed.UI.Controllers
 {
@@ -13,25 +18,29 @@ namespace Kimed.UI.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
+        private readonly HttpWebRequest _request;
 
         public HomeController(ILogger<HomeController> logger,
-                              IConfiguration configuration)
+                              IConfiguration configuration,
+                              IMapper mapper)
         {
             _logger = logger;
             _configuration = configuration;
+            _mapper = mapper;
+            _request = (HttpWebRequest)WebRequest.Create(_configuration.GetValue<string>("UrlApiKimed"));
         }
 
         public IActionResult Index()
         {
             InfoViewModel model = new();
-            var request = (HttpWebRequest)WebRequest.Create(_configuration.GetValue<string>("UrlApiKimed"));
-            request.Method = "GET";
-            request.ContentType = "application/json";
-            request.Accept = "application/json";
+            _request.Method = "GET";
+            _request.ContentType = "application/json";
+            _request.Accept = "application/json";
 
             try
             {
-                using (WebResponse response = request.GetResponse())
+                using (WebResponse response = _request.GetResponse())
                 {
                     using (Stream strReader = response.GetResponseStream())
                     {
@@ -41,7 +50,48 @@ namespace Kimed.UI.Controllers
                         using (StreamReader objReader = new(strReader))
                         {
                             string responseBody = objReader.ReadToEnd();
-                            // Do something with responseBody
+                        }
+                    }
+                }
+            }
+            catch (WebException ex)
+            {
+                // Handle error
+            }
+            return View(model);
+        }
+
+        public IActionResult Create() => View();
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(InfoViewModel model)
+        {
+
+            string data = JsonConvert.SerializeObject(_mapper.Map<InfoDTO>(model));
+            string json =$"{{\"data\":\"{data}\"}}";
+            _request.Method = "POST";
+            
+            _request.ContentType = "application/json";
+            _request.Accept = "application/json";
+
+            using (var streamWriter = new StreamWriter(_request.GetRequestStream()))
+            {
+                streamWriter.Write(json);
+                streamWriter.Flush();
+                streamWriter.Close();
+            }
+
+            try
+            {
+                using (WebResponse response = _request.GetResponse())
+                {
+                    using (Stream strReader = response.GetResponseStream())
+                    {
+                        if (strReader == null) return Error();
+                        using (StreamReader objReader = new(strReader))
+                        {
+                            string responseBody = objReader.ReadToEnd();
                             Console.WriteLine(responseBody);
                         }
                     }
@@ -53,36 +103,6 @@ namespace Kimed.UI.Controllers
             }
             return View();
         }
-
-        public ActionResult RegistrarHotel() => View();
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<ActionResult> RegistrarHotel(InfoViewModel model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        Hotel hotel = new Hotel()
-        //        {
-        //            Id = Guid.NewGuid(),
-        //            Nombre = model.Nombre,
-        //            Descripcion = model.Descripcion,
-        //            CupoMaximo = model.CupoMaximo,
-        //            TipoHotelId = model.TipoHotelId,
-        //            CiudadId = model.CiudadId,
-        //            CreateBy = User.Identity.Name,
-        //            CreateTime = DateTime.Now
-        //        };
-
-        //        var resultado = await _hotelService.RegistrarHotel(hotel);
-        //        if (resultado)
-        //            TempData["mensaje"] = $"Se Registro Correctamente el hotel {model.Nombre}";
-        //        else
-        //            TempData["mensaje"] = $"Ocurrio un problema al tratar de registrar el hotel {model.Nombre}";
-        //        return RedirectToAction("Index");
-        //    }
-        //    return View();
-        //}
 
 
         public IActionResult Privacy()

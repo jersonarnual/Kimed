@@ -4,7 +4,7 @@ using kimed.Business.Repository;
 using Kimed.Data.Context;
 using Kimed.Data.Interface;
 using Kimed.Data.Repository;
-using Kimed.Infraestructure.Util;
+using Kimed.UI.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +29,7 @@ namespace Kimed.UI
             services.AddControllersWithViews();
             var mappingConfig = new MapperConfiguration(mc =>
             {
-                mc.AddProfile(new KimedProfile());
+                mc.AddProfile(new KimedUIProfile());
             });
 
             IMapper mapper = mappingConfig.CreateMapper();

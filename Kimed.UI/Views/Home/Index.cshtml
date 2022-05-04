@@ -29,7 +29,6 @@
                     <tr>
                         <td>@Html.DisplayNameFor(m => m.Name)</td>
                         <td>@Html.DisplayNameFor(m => m.Description)</td>
-                        @*<td>@Html.DisplayNameFor(m => m.)</td>*@
                         <td>Acciones</td>
                     </tr>
                 </thead>
@@ -39,9 +38,9 @@
                         <tr>
                             <td>@item.Name</td>
                             <td>@item.Description</td>
-                            @*<td>@item.CupoMaximo</td>*@
                             <td>
                                 <a asp-controller="Home" asp-action="Update" asp-route-id="@item.Id" class="btn btn-warning">Editar</a>
+                                <a asp-controller="Home" asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Eliminar</a>
                             </td>
                         </tr>
                     }

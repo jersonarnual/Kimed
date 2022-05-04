@@ -10,6 +10,6 @@ namespace kimed.Business.Interface
         Result GetById(Guid id);
         Result Insert(InfoDTO entity);
         Result Update(InfoDTO entity);
-        Result Delete(InfoDTO entity);
+        Result Delete(Guid id);
     }
 }

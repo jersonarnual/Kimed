@@ -72,8 +72,7 @@ namespace Kimed.Data.Repository
         {
             try
             {
-                table.Attach(entity);
-                _context.Entry(entity).State = EntityState.Modified;
+                table.Remove(entity);
                 _context.SaveChanges();
                 return true;
             }

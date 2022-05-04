@@ -27,20 +27,20 @@ namespace kimed.Business.Repository
         #endregion
 
         #region Methods
-        public Result Delete(InfoDTO entity)
+        public Result Delete(Guid id)
         {
             Result result = new();
             try
             {
-                if (object.Equals(entity, null))
+                Info info = _repository.GetById(id);
+                if (object.Equals(info, null))
                 {
                     result.MessageException = $"ERROR: El modelo se encuentra vacio";
                     result.State = false;
                     return result;
                 }
 
-                var model = _mapper.Map<Info>(entity);
-                if (_repository.Delete(model))
+                if (_repository.Delete(info))
                 {
                     result.State = true;
                     result.Message = "Operacion Exitosa";

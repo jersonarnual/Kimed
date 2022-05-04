@@ -15,7 +15,7 @@ namespace Kimed.Api.Controllers
 
         #region Members
         private readonly IInfoBusiness _infoBusiness;
-        private readonly IMapper _mapper; 
+        private readonly IMapper _mapper;
         #endregion
 
         #region Ctor
@@ -39,7 +39,7 @@ namespace Kimed.Api.Controllers
         public object GetById(Guid id)
         {
             Result model = _infoBusiness.GetById(id);
-            if (object.Equals(model.ListModel, null))
+            if (object.Equals(model, null))
                 return null;
             return model;
         }
@@ -76,19 +76,19 @@ namespace Kimed.Api.Controllers
 
         // DELETE api/<InfoController>/5
         [HttpDelete("{id}")]
-        public Result Delete(InfoDTO model)
+        public Result Delete(Guid id)
         {
             Result result = new();
             try
             {
-                result = _infoBusiness.Delete(model);
+                result = _infoBusiness.Delete(id);
             }
             catch (Exception ex)
             {
                 result.MessageException = $"ERROR: {ex.Message} {ex.StackTrace}";
             }
             return result;
-        } 
+        }
         #endregion
     }
 }

@@ -3,10 +3,10 @@
     ViewData["Title"] = "Info";
 }
 <div class="container">
-    @if (TempData["mensaje"] != null)
+    @if (TempData["message"] != null)
     {
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            @TempData["mensaje"]
+            @TempData["message"]
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>

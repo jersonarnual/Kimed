@@ -11,8 +11,9 @@
     </div>
     <div class="row">
         <div class="col-sm-12">
-            <form asp-action="Update" asp-controller="Home" method="post">
+            <form asp-action="Update" asp-controller="Home" method="post" enctype="multipart/form-data">
                 <input type="hidden" asp-for="Id">
+                <input type="hidden" asp-for="File">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <div class="col-md-4 mb-3">
@@ -28,11 +29,13 @@
                         <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
                 </div>
-                @*<div class="col-lg-3 col-sm-6">
-                    <label asp-for="TipoHotelId">Tipo habitacion</label>
-                    <select asp-items="Model.ListTipoHotel" class="form-control" asp-for="TipoHotelId">
-                    </select>
-                </div>*@
+                <div class="form-group">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="FileByte" class="control-label"></label>
+                        <input asp-for="FileByte" class="form-control">
+                        <label class="control-label">Seleccione un fichero</label>
+                    </div>
+                </div>
                 <hr>
                 <div class="form-group">
                     <input type="submit" class="btn btn-primary" value="Editar">

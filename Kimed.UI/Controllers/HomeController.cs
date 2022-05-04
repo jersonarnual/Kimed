@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Kimed.Infraestructure.DTO;
-using Kimed.Infraestructure.Util;
 using Kimed.UI.Models;
 using Kimed.UI.Models.Util;
 using Microsoft.AspNetCore.Mvc;
@@ -73,6 +72,22 @@ namespace Kimed.UI.Controllers
                 var jsonSerializerOptions = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
                 using (var httpClient = new HttpClient())
                 {
+                    if (model.FileByte != null)
+                    {
+                        string[] extensions = new string[] { ".jpg", ".jpeg", ".png" };
+                        var fileExtension = Path.GetExtension(model?.FileByte?.FileName);
+                        if (!extensions.Contains(fileExtension.ToLower()))
+                        {
+                            TempData["message"] = "extencion del archivo no permitido";
+                            return RedirectToAction("Index");
+                        }
+                        using var ms = new MemoryStream();
+                        model.FileByte.CopyTo(ms);
+                        var fileBytes = ms.ToArray();
+                        string fileBase = Convert.ToBase64String(fileBytes);
+                        model.File = fileBase;
+                    }
+
                     var respuesta = await httpClient.PostAsJsonAsync(_uri, _mapper.Map<InfoDTO>(model));
 
                     if (respuesta.StatusCode == HttpStatusCode.BadRequest)
@@ -88,16 +103,16 @@ namespace Kimed.UI.Controllers
                                 bodyError += $"-{error}";
                             ListError.Add(bodyError);
                         }
+                        TempData["message"] = ListError.ToString();
                     }
-
-                    var info = JsonSerializer.Deserialize<List<InfoDTO>>(
-                        await httpClient.GetStringAsync(_uri), jsonSerializerOptions);
+                    TempData["message"] = "Se registro correctamente la info";
+              
                     return RedirectToAction("Index");
                 }
             }
-            catch (WebException ex)
+            catch (WebException)
             {
-                // Handle error
+                TempData["message"] = "Se presento algunos inconvenientes con el registro ";
             }
             return View();
         }
@@ -129,14 +144,29 @@ namespace Kimed.UI.Controllers
                 var jsonSerializerOptions = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
                 using (var httpClient = new HttpClient())
                 {
+                    if (model.FileByte != null)
+                    {
+                        string[] extensions = new string[] { ".jpg", ".jpeg", ".png" };
+                        var fileExtension = Path.GetExtension(model?.FileByte?.FileName);
+                        if (!extensions.Contains(fileExtension.ToLower()))
+                        {
+                            TempData["message"] = "extencion del archivo no permitido";
+                            return RedirectToAction("Index");
+                        }
+                        using var ms = new MemoryStream();
+                        model.FileByte.CopyTo(ms);
+                        var fileBytes = ms.ToArray();
+                        string fileBase = Convert.ToBase64String(fileBytes);
+                        model.File = fileBase;
+                    }
                     await httpClient.PutAsJsonAsync($"{_uri}/{model.Id}", _mapper.Map<InfoDTO>(model));
-
+                    TempData["message"] = "Se actualizo correctamente la info";
                     return RedirectToAction("Index");
                 }
             }
-            catch (WebException ex)
+            catch (WebException)
             {
-                // Handle error
+                TempData["message"] = "Se presento algunos inconvenientes con el registro ";
             }
             return View();
         }
@@ -148,11 +178,12 @@ namespace Kimed.UI.Controllers
                 using (var httpClient = new HttpClient())
                 {
                     await httpClient.DeleteAsync($"{_uri}/{id}");
+                    TempData["message"] = "Se Elimino correctamente la info";
                 }
             }
-            catch (WebException ex)
+            catch (WebException)
             {
-                // Handle error
+                TempData["message"] = "Se presento algunos inconvenientes con el registro ";
             }
             return RedirectToAction("Index");
         }
